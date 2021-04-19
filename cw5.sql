@@ -55,7 +55,6 @@ CREATE TABLE ksiegowosc.wynagrodzenie (
     id_premii integer NOT NULL
 );
 
-
 ALTER TABLE ksiegowosc.godziny
 	ADD FOREIGN KEY (id_pracownika)
 		REFERENCES ksiegowosc.pracownicy(id_pracownika)
@@ -229,17 +228,29 @@ SELECT stanowisko, min(kwota), max(kwota), avg(kwota)
         WHERE stanowisko = 'kierownik'
     GROUP BY stanowisko;
 
--- m) Policz sumê wszystkich wynagrodzeñ.SELECT sum((pensja.kwota + premia.kwota)) AS suma_wszystkich_wynagrodzen FROM ksiegowosc.wynagrodzenie
-    JOIN ksiegowosc.pensja ON ksiegowosc.pensja.id_pensji = ksiegowosc.wynagrodzenie.id_pensji
-    JOIN ksiegowosc.premia ON ksiegowosc.premia.id_premii = ksiegowosc.wynagrodzenie.id_premii;-- n)  Policz sumê wynagrodzeñ w ramach danego stanowiska.SELECT (pensja.kwota + coalesce(premia.kwota, 0)) AS suma_wynagrodzen, pensja.stanowisko FROM ksiegowosc.wynagrodzenie
+-- m) Policz sumê wszystkich wynagrodzeñ.
+
+SELECT sum((pensja.kwota + premia.kwota)) AS suma_wszystkich_wynagrodzen FROM ksiegowosc.wynagrodzenie
     JOIN ksiegowosc.pensja ON ksiegowosc.pensja.id_pensji = ksiegowosc.wynagrodzenie.id_pensji
     JOIN ksiegowosc.premia ON ksiegowosc.premia.id_premii = ksiegowosc.wynagrodzenie.id_premii;
 
--- o) Wyznacz liczbê premii przyznanych dla pracowników danego stanowiska.SELECT count(premia.id_premii), pensja.stanowisko 
+-- n)  Policz sumê wynagrodzeñ w ramach danego stanowiska.
+
+SELECT (pensja.kwota + coalesce(premia.kwota, 0)) AS suma_wynagrodzen, pensja.stanowisko FROM ksiegowosc.wynagrodzenie
+    JOIN ksiegowosc.pensja ON ksiegowosc.pensja.id_pensji = ksiegowosc.wynagrodzenie.id_pensji
+    JOIN ksiegowosc.premia ON ksiegowosc.premia.id_premii = ksiegowosc.wynagrodzenie.id_premii;
+
+-- o) Wyznacz liczbê premii przyznanych dla pracowników danego stanowiska.
+
+SELECT count(premia.id_premii), pensja.stanowisko 
     FROM ksiegowosc.premia
         JOIN ksiegowosc.wynagrodzenie ON ksiegowosc.wynagrodzenie.id_premii = premia.id_premii
         JOIN ksiegowosc.pensja ON pensja.id_pensji = ksiegowosc.wynagrodzenie.id_pensji
-    GROUP BY pensja.stanowisko-- p) Usuñ wszystkich pracowników maj¹cych pensjê mniejsz¹ ni¿ 1200 z³.DELETE pracownicy
+    GROUP BY pensja.stanowisko
+
+-- p) Usuñ wszystkich pracowników maj¹cych pensjê mniejsz¹ ni¿ 1200 z³.
+
+DELETE pracownicy
 	FROM ksiegowosc.pracownicy AS pracownicy
 		JOIN ksiegowosc.wynagrodzenie AS wynagrodzenie
 			ON  wynagrodzenie.id_pracownika = pracownicy.id_pracownika
@@ -249,9 +260,9 @@ SELECT stanowisko, min(kwota), max(kwota), avg(kwota)
 
 SELECT imie, nazwisko, kwota 
 	FROM ksiegowosc.pracownicy AS pracownicy
-	JOIN ksiegowosc.wynagrodzenie AS wynagrodzenie
+	    JOIN ksiegowosc.wynagrodzenie AS wynagrodzenie
 	ON wynagrodzenie.id_pracownika = pracownicy.id_pracownika
-	JOIN ksiegowosc.pensja AS pensja
+	    JOIN ksiegowosc.pensja AS pensja
 	ON wynagrodzenie.id_pensji = pensja.id_pensji
 
-SELECT * FROM ksiegowosc.wynagrodzenie
+SELECT * FROM ksiegowosc.wynagrodzenie
